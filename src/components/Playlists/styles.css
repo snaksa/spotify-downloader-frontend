@@ -1,0 +1,55 @@
+.main {
+    width: 90%;
+    margin: 30px auto;
+}
+
+.header {
+    width: 30%;
+    float: left;
+}
+
+.headerProfile {
+    width: fit-content; 
+    text-align: center;
+}
+
+.profileImage {
+    margin: 10;
+    width: 60px;
+    border: 2px solid #67d860;
+    border-radius: 50px;
+}
+
+.headerLogo {
+    width: 40%; 
+    text-align: center; 
+    float: left;
+}
+
+.playlists {
+    width: 50%;
+    float: left;
+    padding-right: 10px;
+}
+
+tbody tr:hover td {
+    background-color: #67d860;
+    cursor: pointer;
+}
+
+.tableRowSelected td {
+    background-color: #67d860;
+}
+
+.playlistImage {
+    margin: 10;
+    width: 60px;
+    border: 2px solid #67d860;
+}
+
+.tracks {
+    width: 50%;
+    float: right;
+    padding-left: 10px; 
+    border-left: 1px solid grey;
+}

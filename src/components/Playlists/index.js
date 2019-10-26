@@ -6,7 +6,7 @@ const Playlists = () => {
 
   const [playlists, setPlaylists] = useState([]);
   const [tracks, setTracks] = useState([]);
-  const [selectedPlaylist, setSelectedPlylist] = useState('');
+  const [selectedPlaylist, setSelectedPlaylist] = useState('');
 
   useEffect(() => {
     fetch('http://localhost:8001/api/me/playlists', {
@@ -36,7 +36,7 @@ const Playlists = () => {
   }, []);
 
   const getTracks = (id) => {
-    setSelectedPlylist(id);
+    setSelectedPlaylist(id);
     fetch('http://localhost:8001/api/playlists/' + id + '/tracks', {
       method: 'get',
       mode: 'cors',

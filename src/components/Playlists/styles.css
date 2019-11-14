@@ -53,3 +53,7 @@ tbody tr:hover td {
     padding-left: 10px; 
     border-left: 1px solid grey;
 }
+
+.youtubeIcon {
+    width: 50px;
+}

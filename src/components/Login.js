@@ -7,13 +7,15 @@ const Login = ({ location, history }) => {
 
   useEffect(() => {
     if (!error) {
-      fetch('http://localhost:8001/spotify/callback?code=' + code)
+      fetch('http://localhost:8080/spotify/callback?code=' + code)
         .then(response => response.json())
         .then((data) => {
           localStorage.setItem('accessToken', data.accessToken);
           localStorage.setItem('refreshToken', data.refreshToken);
 
-          fetch('http://localhost:8001/api/me', {
+          console.log(data.accessToken);
+
+          fetch('http://localhost:8080/api/me', {
             method: 'get',
             mode: 'cors',
             headers: new Headers({

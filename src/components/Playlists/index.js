@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Table, Image } from 'react-bootstrap';
+import * as ytdl from 'ytdl-core';
+import * as fs from 'fs';
 import './styles.css';
 
 const Playlists = () => {
@@ -7,9 +9,10 @@ const Playlists = () => {
   const [playlists, setPlaylists] = useState([]);
   const [tracks, setTracks] = useState([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState('');
+  const [fetchedIds, setFetchedIds] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:8001/api/me/playlists', {
+    fetch('http://localhost:8080/api/me/playlists', {
       method: 'get',
       mode: 'cors',
       headers: new Headers({
@@ -37,7 +40,7 @@ const Playlists = () => {
 
   const getTracks = (id) => {
     setSelectedPlaylist(id);
-    fetch('http://localhost:8001/api/playlists/' + id + '/tracks', {
+    fetch('http://localhost:8080/api/playlists/' + id + '/tracks', {
       method: 'get',
       mode: 'cors',
       headers: new Headers({
@@ -55,11 +58,77 @@ const Playlists = () => {
           return {
             id: item.id,
             name: item.name,
-            artists: artists.join(', ')
+            artists: artists.join(' & ')
           }
         });
 
         setTracks(result);
+      })
+      .catch(error => console.log('Authorization failed : ' + error.message));
+  }
+
+
+  const getYoutubeLinks = () => {
+
+    let names = {};
+    for (let i = 0; i < tracks.length; i++) {
+      names[tracks[i].id] = tracks[i].artists + ' ' + tracks[i].name;
+    }
+
+    fetch('http://localhost:8080/api/youtube/find', {
+      method: 'post',
+      mode: 'cors',
+      body: JSON.stringify({
+        songs: names
+      }),
+      headers: new Headers({
+        'Authorization': 'Bearer ' + localStorage.getItem('accessToken'),
+        'Content-Type': 'application/json',
+      }),
+    })
+      .then(response => response.json())
+      .then(json => {
+        setFetchedIds(json);
+
+
+        const arr = Object.values(json);
+        for (var i = 0; i < arr.length; i++) {
+          console.log("https://youtube.com/watch?v=" + arr[i]);
+          ytdl("https://youtube.com/watch?v=" + arr[i]).pipe(
+            fs.createWriteStream(
+              "test" + i + ".mp3"
+            )
+          );
+        }
+
+      })
+      .catch(error => console.log('Authorization failed : ' + error.message));
+  }
+
+  const downloadTrack = (id, name) => {
+
+    fetch(`http://localhost:9090/track?id=${id}`, {
+      method: 'get',
+      mode: 'cors',
+    })
+      .then(response => {
+        if (response.status === 200) {
+          return response.blob();
+        }
+      })
+      .then(blob => {
+        if(!blob) {
+          console.log('error');
+          return;
+        }
+
+        var url = window.URL.createObjectURL(blob);
+        let a = document.createElement('a');
+        a.href = url;
+        a.download = `${name}.mp3`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
       })
       .catch(error => console.log('Authorization failed : ' + error.message));
   }
@@ -104,7 +173,8 @@ const Playlists = () => {
                       <td style={{ verticalAlign: 'middle' }}>
                         {playlist.total}
                       </td>
-                      <td></td>
+                      <td>
+                      </td>
                     </tr>
                   })
                 }
@@ -119,7 +189,13 @@ const Playlists = () => {
                   <th width={'40%'}>Artist</th>
                   <th width={'40%'}>Title</th>
                   <th width={'20%'}></th>
-                  <th></th>
+                  <th>
+                    <Image
+                      className={'youtubeIcon'}
+                      src={'https://www.freepnglogos.com/uploads/youtube-logo-icon-transparent---32.png'}
+                      onClick={() => getYoutubeLinks()}
+                    />
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -133,7 +209,23 @@ const Playlists = () => {
                         {track.name}
                       </td>
                       <td style={{ verticalAlign: 'middle' }}>
-                        x
+                        {
+                          track.id in fetchedIds && fetchedIds[track.id] &&
+                          <React.Fragment>
+                            <Image
+                              className={'youtubeIcon'}
+                              src={'https://www.freepnglogos.com/uploads/youtube-logo-icon-transparent---32.png'}
+                              onClick={() => window.open('https://youtube.com/watch?v=' + fetchedIds[track.id], '_blank')}
+                            />
+
+                            <Image
+                              className={'youtubeIcon'}
+                              src={'https://cdn.pixabay.com/photo/2016/12/18/13/45/download-1915753_960_720.png'}
+                              onClick={() => downloadTrack(fetchedIds[track.id], track.artists + ' - ' + track.name)}
+                            />
+                          </React.Fragment>
+                        }
+
                       </td>
                       <td></td>
                     </tr>

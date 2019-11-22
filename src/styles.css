@@ -1,6 +1,27 @@
+.logo {
+    width: 100%;
+    margin-top: 100px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.logo a {
+    background-color: #1dd760;
+    padding: 20px 50px 20px 50px;
+    font-size: 50px;
+    color: #FFF;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.logo a:hover {
+    text-decoration: none;
+}
+
 .main {
     width: 90%;
     margin: 30px auto;
+    opacity: 0.9;
 }
 
 .header {
@@ -32,9 +53,13 @@
     padding-right: 10px;
 }
 
-tbody tr:hover td {
+.playlists tbody tr:hover td {
     background-color: #67d860;
     cursor: pointer;
+}
+
+.tracks tbody tr:hover td {
+    background-color: #67d860;
 }
 
 .tableRowSelected td {
@@ -56,4 +81,5 @@ tbody tr:hover td {
 
 .youtubeIcon {
     width: 50px;
+    cursor: pointer;
 }

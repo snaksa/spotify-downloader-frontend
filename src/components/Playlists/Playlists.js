@@ -1,25 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Table, Image } from 'react-bootstrap';
-import * as ytdl from 'ytdl-core';
-import * as fs from 'fs';
-import './styles.css';
+import request from '../../api/request';
 
-const Playlists = () => {
+const Playlists = ({history}) => {
 
   const [playlists, setPlaylists] = useState([]);
   const [tracks, setTracks] = useState([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState('');
-  const [fetchedIds, setFetchedIds] = useState([]);
+  const [fetchedIds, setFetchedIds] = useState({});
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/me/playlists', {
-      method: 'get',
-      mode: 'cors',
-      headers: new Headers({
-        'Authorization': 'Bearer ' + localStorage.getItem('accessToken'),
-        'Content-Type': 'application/json',
-      }),
-    })
+    request('/api/me/playlists')
       .then(response => response.json())
       .then(json => {
         const result = json.map((item) => {
@@ -40,14 +31,8 @@ const Playlists = () => {
 
   const getTracks = (id) => {
     setSelectedPlaylist(id);
-    fetch('http://localhost:8080/api/playlists/' + id + '/tracks', {
-      method: 'get',
-      mode: 'cors',
-      headers: new Headers({
-        'Authorization': 'Bearer ' + localStorage.getItem('accessToken'),
-        'Content-Type': 'application/json',
-      }),
-    })
+
+    request(`/api/playlists/${id}/tracks`)
       .then(response => response.json())
       .then(json => {
         const result = json.map((item) => {
@@ -58,7 +43,8 @@ const Playlists = () => {
           return {
             id: item.id,
             name: item.name,
-            artists: artists.join(' & ')
+            artists: artists.join(' & '),
+            status: 0
           }
         });
 
@@ -75,49 +61,48 @@ const Playlists = () => {
       names[tracks[i].id] = tracks[i].artists + ' ' + tracks[i].name;
     }
 
-    fetch('http://localhost:8080/api/youtube/find', {
-      method: 'post',
-      mode: 'cors',
-      body: JSON.stringify({
-        songs: names
-      }),
-      headers: new Headers({
-        'Authorization': 'Bearer ' + localStorage.getItem('accessToken'),
-        'Content-Type': 'application/json',
-      }),
+    request(`/api/youtube/find`, 'post', {
+      songs: names
     })
       .then(response => response.json())
       .then(json => {
         setFetchedIds(json);
-
-
-        const arr = Object.values(json);
-        for (var i = 0; i < arr.length; i++) {
-          console.log("https://youtube.com/watch?v=" + arr[i]);
-          ytdl("https://youtube.com/watch?v=" + arr[i]).pipe(
-            fs.createWriteStream(
-              "test" + i + ".mp3"
-            )
-          );
-        }
-
       })
       .catch(error => console.log('Authorization failed : ' + error.message));
   }
 
-  const downloadTrack = (id, name) => {
+  const downloadTrack = (id, track) => {
+    const name = track.artists + ' - ' + track.name;
 
-    fetch(`http://localhost:9090/track?id=${id}`, {
-      method: 'get',
-      mode: 'cors',
-    })
+    let t = tracks.map(t => {
+      if (track.id === t.id) {
+        t.status = 1;
+      }
+
+      return t;
+    });
+
+    setTracks(t);
+
+    request(`/track?id=${id}`, 'get', null, process.env.REACT_APP_DOWNLOAD_URL)
       .then(response => {
         if (response.status === 200) {
           return response.blob();
         }
       })
       .then(blob => {
-        if(!blob) {
+
+        let t = tracks.map(t => {
+          if (track.id === t.id) {
+            t.status = 2;
+          }
+
+          return t;
+        });
+
+        setTracks(t);
+
+        if (!blob) {
           console.log('error');
           return;
         }
@@ -133,6 +118,21 @@ const Playlists = () => {
       .catch(error => console.log('Authorization failed : ' + error.message));
   }
 
+  const downloadAll = () => {
+
+    tracks.forEach(track => {
+      if (track.id in fetchedIds && fetchedIds[track.id]) {
+        downloadTrack(fetchedIds[track.id], track);
+      }
+    });
+  }
+
+  const logout = () => {
+    localStorage.setItem('accessToken', null);
+    localStorage.setItem('refreshToken', null);
+    history.push('/');
+  }
+
   return (
     <div className={'main'}>
       <Card bg="dark" text="white">
@@ -142,7 +142,15 @@ const Playlists = () => {
               <Image src={localStorage.getItem('image')} className={'profileImage'} />
               <br />
               {localStorage.getItem('name')}
+
+              {
+                localStorage.getItem('accessToken') &&
+                <div onClick={() => logout()} style={{ color: '#67d860', cursor: 'pointer' }}>
+                  Logout
+                </div>
+              }
             </div>
+            
           </div>
 
           <div className={'headerLogo'}>
@@ -183,18 +191,28 @@ const Playlists = () => {
           </div>
 
           <div className={'tracks'}>
-            <Table striped hover variant="dark">
+            <Table striped variant="dark">
               <thead>
                 <tr>
                   <th width={'40%'}>Artist</th>
                   <th width={'40%'}>Title</th>
-                  <th width={'20%'}></th>
                   <th>
-                    <Image
-                      className={'youtubeIcon'}
-                      src={'https://www.freepnglogos.com/uploads/youtube-logo-icon-transparent---32.png'}
-                      onClick={() => getYoutubeLinks()}
-                    />
+                    {
+                      tracks.length > 0 &&
+                      <Image
+                        className={'youtubeIcon'}
+                        src={'https://www.freepnglogos.com/uploads/youtube-logo-icon-transparent---32.png'}
+                        onClick={() => getYoutubeLinks()}
+                      />
+                    }
+                    {
+                      Object.keys(fetchedIds).length > 0 &&
+                      <Image
+                        className={'youtubeIcon'}
+                        src={'https://cdn.pixabay.com/photo/2016/12/18/13/45/download-1915753_960_720.png'}
+                        onClick={() => downloadAll()}
+                      />
+                    }
                   </th>
                 </tr>
               </thead>
@@ -218,12 +236,39 @@ const Playlists = () => {
                               onClick={() => window.open('https://youtube.com/watch?v=' + fetchedIds[track.id], '_blank')}
                             />
 
-                            <Image
-                              className={'youtubeIcon'}
-                              src={'https://cdn.pixabay.com/photo/2016/12/18/13/45/download-1915753_960_720.png'}
-                              onClick={() => downloadTrack(fetchedIds[track.id], track.artists + ' - ' + track.name)}
-                            />
+                            {
+                              track.status === 0 &&
+                              <Image
+                                className={'youtubeIcon'}
+                                src={'https://cdn.pixabay.com/photo/2016/12/18/13/45/download-1915753_960_720.png'}
+                                onClick={() => downloadTrack(fetchedIds[track.id], track)}
+                              />
+                            }
                           </React.Fragment>
+                        }
+
+                        {
+                          track.status === 1 &&
+                          <Image
+                            className={'youtubeIcon'}
+                            src={'https://crunchy.co/wp-content/themes/crunchy/assets/images/ajax-loader.svg'}
+                          />
+                        }
+
+                        {
+                          track.status === 2 &&
+                          <Image
+                            className={'youtubeIcon'}
+                            src={'https://cdn0.iconfinder.com/data/icons/round-ui-icons/512/tick_green.png'}
+                          />
+                        }
+
+                        {
+                          track.status === 3 &&
+                          <Image
+                            className={'youtubeIcon'}
+                            src={'http://www.digital-web.com/wp-content/uploads/2014/01/false-2061131__340.png'}
+                          />
                         }
 
                       </td>

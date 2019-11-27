@@ -1,13 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Table, Image } from 'react-bootstrap';
+import {
+  TRACK_STATUS_FETCHED,
+  TRACK_STATUS_DOWNLOADING,
+  TRACK_STATUS_DOWNLOAD_SUCCESS,
+  TRACK_STATUS_DOWNLOAD_FAILURE
+} from '../../constants/downloadStatus';
+import spotifyLogo from '../../images/spotifyLogo.png';
+import youtubeLogo from '../../images/youtubeLogo.png';
+import loader from '../../images/loader.svg';
+import download from '../../images/download.webp';
+import success from '../../images/success.png';
+import error from '../../images/error.png';
 import request from '../../api/request';
 
-const Playlists = ({history}) => {
+const Playlists = ({ history }) => {
 
   const [playlists, setPlaylists] = useState([]);
   const [tracks, setTracks] = useState([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState('');
   const [fetchedIds, setFetchedIds] = useState({});
+  const [fetching, setFetching] = useState(false);
 
   useEffect(() => {
     request('/api/me/playlists')
@@ -44,7 +57,7 @@ const Playlists = ({history}) => {
             id: item.id,
             name: item.name,
             artists: artists.join(' & '),
-            status: 0
+            status: TRACK_STATUS_FETCHED
           }
         });
 
@@ -61,12 +74,14 @@ const Playlists = ({history}) => {
       names[tracks[i].id] = tracks[i].artists + ' ' + tracks[i].name;
     }
 
+    setFetching(true);
     request(`/api/youtube/find`, 'post', {
       songs: names
     })
       .then(response => response.json())
       .then(json => {
         setFetchedIds(json);
+        setFetching(false);
       })
       .catch(error => console.log('Authorization failed : ' + error.message));
   }
@@ -76,7 +91,7 @@ const Playlists = ({history}) => {
 
     let t = tracks.map(t => {
       if (track.id === t.id) {
-        t.status = 1;
+        t.status = TRACK_STATUS_DOWNLOADING;
       }
 
       return t;
@@ -94,18 +109,19 @@ const Playlists = ({history}) => {
 
         let t = tracks.map(t => {
           if (track.id === t.id) {
-            t.status = 2;
+            if (!blob) {
+              t.status = TRACK_STATUS_DOWNLOAD_FAILURE;
+
+              console.log('error');
+              return;
+            }
+            t.status = TRACK_STATUS_DOWNLOAD_SUCCESS;
           }
 
           return t;
         });
 
         setTracks(t);
-
-        if (!blob) {
-          console.log('error');
-          return;
-        }
 
         var url = window.URL.createObjectURL(blob);
         let a = document.createElement('a');
@@ -150,11 +166,11 @@ const Playlists = ({history}) => {
                 </div>
               }
             </div>
-            
+
           </div>
 
           <div className={'headerLogo'}>
-            <Image src={'https://1.bp.blogspot.com/-xtFG2HxsdKc/XHkuICL5ePI/AAAAAAAAIPs/-FBy2Apa3qUxBF1WNOzB_dF4_KUuLJrygCK4BGAYYCw/s1600/spotify%2Bicon%2B.png'} style={{ margin: 10, width: '200px', }} />
+            <Image src={spotifyLogo} style={{ margin: 10, width: '200px', }} />
           </div>
         </Card.Header>
         <Card.Body>
@@ -198,18 +214,26 @@ const Playlists = ({history}) => {
                   <th width={'40%'}>Title</th>
                   <th>
                     {
-                      tracks.length > 0 &&
+                      tracks.length > 0 && !fetching &&
                       <Image
                         className={'youtubeIcon'}
-                        src={'https://www.freepnglogos.com/uploads/youtube-logo-icon-transparent---32.png'}
+                        src={youtubeLogo}
                         onClick={() => getYoutubeLinks()}
+                      />
+                    }
+
+                    {
+                      tracks.length > 0 && fetching &&
+                      <Image
+                        className={'youtubeIcon'}
+                        src={loader}
                       />
                     }
                     {
                       Object.keys(fetchedIds).length > 0 &&
                       <Image
                         className={'youtubeIcon'}
-                        src={'https://cdn.pixabay.com/photo/2016/12/18/13/45/download-1915753_960_720.png'}
+                        src={download}
                         onClick={() => downloadAll()}
                       />
                     }
@@ -232,15 +256,15 @@ const Playlists = ({history}) => {
                           <React.Fragment>
                             <Image
                               className={'youtubeIcon'}
-                              src={'https://www.freepnglogos.com/uploads/youtube-logo-icon-transparent---32.png'}
+                              src={youtubeLogo}
                               onClick={() => window.open('https://youtube.com/watch?v=' + fetchedIds[track.id], '_blank')}
                             />
 
                             {
-                              track.status === 0 &&
+                              track.status === TRACK_STATUS_FETCHED &&
                               <Image
                                 className={'youtubeIcon'}
-                                src={'https://cdn.pixabay.com/photo/2016/12/18/13/45/download-1915753_960_720.png'}
+                                src={download}
                                 onClick={() => downloadTrack(fetchedIds[track.id], track)}
                               />
                             }
@@ -248,26 +272,26 @@ const Playlists = ({history}) => {
                         }
 
                         {
-                          track.status === 1 &&
+                          track.status === TRACK_STATUS_DOWNLOADING &&
                           <Image
                             className={'youtubeIcon'}
-                            src={'https://crunchy.co/wp-content/themes/crunchy/assets/images/ajax-loader.svg'}
+                            src={loader}
                           />
                         }
 
                         {
-                          track.status === 2 &&
+                          track.status === TRACK_STATUS_DOWNLOAD_SUCCESS &&
                           <Image
                             className={'youtubeIcon'}
-                            src={'https://cdn0.iconfinder.com/data/icons/round-ui-icons/512/tick_green.png'}
+                            src={success}
                           />
                         }
 
                         {
-                          track.status === 3 &&
+                          track.status === TRACK_STATUS_DOWNLOAD_FAILURE &&
                           <Image
                             className={'youtubeIcon'}
-                            src={'http://www.digital-web.com/wp-content/uploads/2014/01/false-2061131__340.png'}
+                            src={error}
                           />
                         }
 

@@ -7,7 +7,7 @@ services:
     build:
       context: .
     container_name: spotify-frontend
-    # volumes:
-    #  - ./server.js:/usr/src/app/server.js
+    env_file:
+    - .env
     ports:
       - "3001:3000"

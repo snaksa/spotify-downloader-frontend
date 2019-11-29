@@ -111,13 +111,12 @@ const Playlists = ({ history }) => {
           if (track.id === t.id) {
             if (!blob) {
               t.status = TRACK_STATUS_DOWNLOAD_FAILURE;
-
-              console.log('error');
-              return;
             }
-            t.status = TRACK_STATUS_DOWNLOAD_SUCCESS;
+            else {
+              t.status = TRACK_STATUS_DOWNLOAD_SUCCESS;
+            }
           }
-
+          
           return t;
         });
 

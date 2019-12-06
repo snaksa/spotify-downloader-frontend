@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Table, Image } from 'react-bootstrap';
+import useStyles from './styles';
+
 import {
   TRACK_STATUS_FETCHED,
   TRACK_STATUS_DOWNLOADING,
@@ -15,6 +17,8 @@ import error from '../../images/error.png';
 import request from '../../api/request';
 
 const Playlists = ({ history }) => {
+
+  const classes = useStyles();
 
   const [playlists, setPlaylists] = useState([]);
   const [tracks, setTracks] = useState([]);
@@ -116,7 +120,7 @@ const Playlists = ({ history }) => {
               t.status = TRACK_STATUS_DOWNLOAD_SUCCESS;
             }
           }
-          
+
           return t;
         });
 
@@ -149,12 +153,12 @@ const Playlists = ({ history }) => {
   }
 
   return (
-    <div className={'main'}>
+    <div className={classes.main}>
       <Card bg="dark" text="white">
         <Card.Header>
-          <div className={'header'}>
-            <div className={'headerProfile'}>
-              <Image src={localStorage.getItem('image')} className={'profileImage'} />
+          <div className={classes.header}>
+            <div className={classes.headerProfile}>
+              <Image src={localStorage.getItem('image')} className={classes.profileImage} />
               <br />
               {localStorage.getItem('name')}
 
@@ -168,12 +172,12 @@ const Playlists = ({ history }) => {
 
           </div>
 
-          <div className={'headerLogo'}>
+          <div className={classes.headerLogo}>
             <Image src={spotifyLogo} style={{ margin: 10, width: '200px', }} />
           </div>
         </Card.Header>
         <Card.Body>
-          <div className={'playlists'}>
+          <div className={classes.playlists}>
             <Table striped hover variant="dark">
               <thead>
                 <tr>
@@ -186,9 +190,10 @@ const Playlists = ({ history }) => {
               <tbody>
                 {
                   playlists.map((playlist, index) => {
-                    return <tr key={index} className={'tableRow' + (playlist.id === selectedPlaylist ? 'Selected' : '')} onClick={() => getTracks(playlist.id)}>
+                    // TODO: what are we gonna do !?!?!?
+                    return <tr key={index} className={(playlist.id === selectedPlaylist ? classes.tableRowSelected : classes.tableRow)} onClick={() => getTracks(playlist.id)}>
                       <td style={{ verticalAlign: 'middle' }}>
-                        <Image src={playlist.image} className={'playlistImage'} />
+                        <Image src={playlist.image} className={classes.playlistImage} />
                       </td>
                       <td style={{ verticalAlign: 'middle' }}>
                         {playlist.name}
@@ -205,7 +210,7 @@ const Playlists = ({ history }) => {
             </Table>
           </div>
 
-          <div className={'tracks'}>
+          <div className={classes.tracks}>
             <Table striped variant="dark">
               <thead>
                 <tr>
@@ -215,7 +220,7 @@ const Playlists = ({ history }) => {
                     {
                       tracks.length > 0 && !fetching &&
                       <Image
-                        className={'youtubeIcon'}
+                        className={classes.youtubeIcon}
                         src={youtubeLogo}
                         onClick={() => getYoutubeLinks()}
                       />
@@ -224,14 +229,14 @@ const Playlists = ({ history }) => {
                     {
                       tracks.length > 0 && fetching &&
                       <Image
-                        className={'youtubeIcon'}
+                        className={classes.youtubeIcon}
                         src={loader}
                       />
                     }
                     {
                       Object.keys(fetchedIds).length > 0 &&
                       <Image
-                        className={'youtubeIcon'}
+                        className={classes.youtubeIcon}
                         src={download}
                         onClick={() => downloadAll()}
                       />
@@ -254,7 +259,7 @@ const Playlists = ({ history }) => {
                           track.id in fetchedIds && fetchedIds[track.id] &&
                           <React.Fragment>
                             <Image
-                              className={'youtubeIcon'}
+                              className={classes.youtubeIcon}
                               src={youtubeLogo}
                               onClick={() => window.open('https://youtube.com/watch?v=' + fetchedIds[track.id], '_blank')}
                             />
@@ -262,7 +267,7 @@ const Playlists = ({ history }) => {
                             {
                               track.status === TRACK_STATUS_FETCHED &&
                               <Image
-                                className={'youtubeIcon'}
+                                className={classes.youtubeIcon}
                                 src={download}
                                 onClick={() => downloadTrack(fetchedIds[track.id], track)}
                               />
@@ -273,7 +278,7 @@ const Playlists = ({ history }) => {
                         {
                           track.status === TRACK_STATUS_DOWNLOADING &&
                           <Image
-                            className={'youtubeIcon'}
+                            className={classes.youtubeIcon}
                             src={loader}
                           />
                         }
@@ -281,7 +286,7 @@ const Playlists = ({ history }) => {
                         {
                           track.status === TRACK_STATUS_DOWNLOAD_SUCCESS &&
                           <Image
-                            className={'youtubeIcon'}
+                            className={classes.youtubeIcon}
                             src={success}
                           />
                         }
@@ -289,7 +294,7 @@ const Playlists = ({ history }) => {
                         {
                           track.status === TRACK_STATUS_DOWNLOAD_FAILURE &&
                           <Image
-                            className={'youtubeIcon'}
+                            className={classes.youtubeIcon}
                             src={error}
                           />
                         }

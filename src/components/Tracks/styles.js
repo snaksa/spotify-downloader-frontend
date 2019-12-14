@@ -1,39 +1,25 @@
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(theme => ({
-    main: {
-        width: '90%',
-        margin: '30px auto',
-        opacity: '0.9'
-    },
-    playlists: {
+    tracks: {
         width: '50%',
-        float: 'left',
-        paddingRight: '10px',
+        float: 'right',
+        paddingLeft: '10px',
+        borderLeft: '1px solid grey',
         '& tbody': {
             '& tr': {
                 '&:hover': {
                     '& td': {
-                        backgroundColor: '#67d860',
-                        cursor: 'pointer'
+                        backgroundColor: '#67d860'
                     }
-                },
+                }
             }
         },
         [theme.breakpoints.down('md')]: {
             width: '100%',
+            marginTop: '30px',
             float: 'none'
         },
-    },
-    tableRowSelected: {
-        '& td': {
-            backgroundColor: '#67d860'
-        }
-    },
-    playlistImage: {
-        margin: '10',
-        width: '60px',
-        border: '2px solid #67d860'
     },
     youtubeIcon: {
         width: '34px',

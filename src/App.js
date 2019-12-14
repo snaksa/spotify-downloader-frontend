@@ -1,16 +1,22 @@
 import React from 'react';
 import { Route, BrowserRouter as Router } from 'react-router-dom'
-import { ThemeProvider } from '@material-ui/core/styles';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Home from './components/Home/Home';
 import Login from './components/Login';
 import Playlists from './components/Playlists/Playlists';
 
-const theme = {};
+const theme = createMuiTheme({
+  palette: {
+    primary:  {
+      main: '#67d860'
+    }
+  }
+});
 
 const App = () => {
   return (
     <div>
-      <ThemeProvider theme={theme}>
+      <MuiThemeProvider theme={theme}>
         <Router>
           <div>
             <Route exact path="/" component={Home} />
@@ -18,7 +24,7 @@ const App = () => {
             <Route path="/playlists" component={Playlists} />
           </div>
         </Router>
-      </ThemeProvider>
+      </MuiThemeProvider>
     </div>
   );
 }

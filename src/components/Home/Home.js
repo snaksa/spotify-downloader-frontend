@@ -32,7 +32,7 @@ const Home = () => {
 
     const downloadTrack = (url, title) => {
         url = encodeURIComponent(url);
-        request(`/track?id=${url}&title=${title}`, 'get', null, process.env.REACT_APP_DOWNLOAD_URL)
+        request(`/track?id=${url}`, 'get', null, process.env.REACT_APP_DOWNLOAD_URL)
             .then(response => {
                 if (response.status === 200) {
                     return response.blob();
@@ -46,6 +46,7 @@ const Home = () => {
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
+                setTrackTitle('Download next');
             })
             .catch(error => console.log('Request failed: ' + error.message));
     };

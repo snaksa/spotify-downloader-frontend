@@ -3,7 +3,7 @@ const request = (url, method = 'get', params = null, host = '') => {
 
     params = params ? JSON.stringify(params) : null;
 
-    return fetch(`http://${host}${url}`, {
+    return fetch(`https://${host}${url}`, {
         method: method,
         mode: 'cors',
         body: params,

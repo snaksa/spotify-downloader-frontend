@@ -13,7 +13,7 @@ const Home = () => {
     const [trackTitle, setTrackTitle] = useState('');
     const [trackThumbnail, setTrackThumbnail] = useState('');
 
-    const url = encodeURIComponent(`https://${process.env.REACT_APP_URL}/login`);
+    const url = encodeURIComponent(`http://${process.env.REACT_APP_URL}/login`);
 
     const getInfo = (url) => {
         request(`/info?id="${url}"`, 'get', null, process.env.REACT_APP_DOWNLOAD_URL)

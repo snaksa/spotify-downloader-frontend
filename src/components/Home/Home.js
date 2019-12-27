@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import useStyles from './styles';
-import {Helmet} from "react-helmet";
-import {Form, Image} from "react-bootstrap";
+import { Helmet } from "react-helmet";
+import { Form, Image } from "react-bootstrap";
 import Button from '@material-ui/core/Button';
 import spotifyLogo from "../../images/spotifyLogo.png";
 import youtubeLogo from "../../images/youtubeLogoText.png";
@@ -12,10 +12,13 @@ const Home = () => {
     const [youtubeUrl, setYoutubeUrl] = useState('');
     const [trackTitle, setTrackTitle] = useState('');
     const [trackThumbnail, setTrackThumbnail] = useState('');
+    const [downloadButtonDisabled, setDownloadButtonDisabled] = useState(false);
+    const [downloadButtonText, setDownloadButtonText] = useState('Download');
 
     const url = encodeURIComponent(`${process.env.REACT_APP_URL}/login`);
 
     const getInfo = (url) => {
+        setDownloadButtonDisabled(true);
         request(`/info?id="${url}"`, 'get', null, process.env.REACT_APP_DOWNLOAD_URL)
             .then(response => {
                 if (response.status === 200) {
@@ -25,6 +28,9 @@ const Home = () => {
             .then(response => {
                 setTrackTitle(response.title);
                 setTrackThumbnail(response.thumbnail);
+                setDownloadButtonDisabled(false);
+                setDownloadButtonText('Download next');
+                setYoutubeUrl('');
                 downloadTrack(response.videoId, response.title);
             })
             .catch(error => console.log('Authorization failed : ' + error.message));
@@ -46,7 +52,6 @@ const Home = () => {
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
-                setTrackTitle('Download next');
             })
             .catch(error => console.log('Request failed: ' + error.message));
     };
@@ -59,7 +64,7 @@ const Home = () => {
             <div className={'logo'}>
                 <div>
                     <div className={classes.headerLogo}>
-                        <Image className={classes.youtubeLogo} src={youtubeLogo}/>
+                        <Image className={classes.youtubeLogo} src={youtubeLogo} />
                         <div className={classes.inputContainer}>
                             <Form.Control
                                 placeholder="Paste video URL"
@@ -69,20 +74,24 @@ const Home = () => {
                             <Button
                                 variant="contained"
                                 color="primary"
-                                classes={{root: classes.youtubeDownloadButton}}
-                                onClick={() => getInfo(youtubeUrl)}>
-                                {trackTitle ? trackTitle : 'Download'}
+                                classes={{ root: classes.youtubeDownloadButton }}
+                                onClick={() => getInfo(youtubeUrl)}
+                                disabled={downloadButtonDisabled}>
+                                {downloadButtonText}
                             </Button>
                             <Form.Text className="text-muted">
                                 (e.g. https://www.youtube.com/watch?v=VsN7E35LpJE)
                             </Form.Text>
+                            <Form.Text>
+                                {trackTitle}
+                            </Form.Text>
 
-                            <Image src={trackThumbnail}/>
+                            <Image src={trackThumbnail} />
                         </div>
                     </div>
                     <div className={classes.headerLogo}>
                         <a href={`https://accounts.spotify.com/en/authorize?client_id=${process.env.REACT_APP_SPOTIFY_CLIENT_ID}&response_type=code&scope=user-read-private%20user-library-read%20user-read-email&redirect_uri=${url}`}>
-                            <Image className={classes.logoImage} src={spotifyLogo}/>
+                            <Image className={classes.logoImage} src={spotifyLogo} />
                         </a>
                     </div>
                 </div>

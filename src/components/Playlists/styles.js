@@ -1,9 +1,15 @@
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(theme => ({
+    content: {
+        width: '100%',
+        height: 'auto',
+        padding: '30px',
+        backgroundColor: theme.palette.primary.main
+    },
     main: {
         width: '90%',
-        margin: '30px auto',
+        margin: '0px auto',
         opacity: '0.9'
     },
     playlists: {

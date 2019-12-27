@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import {Card, Table, Image} from 'react-bootstrap';
-import {Helmet} from "react-helmet";
+import React, { useEffect, useState } from 'react';
+import { Card, Table, Image } from 'react-bootstrap';
+import { Helmet } from "react-helmet";
 import useStyles from './styles';
-import {TRACK_STATUS_FETCHED} from '../../constants/downloadStatus';
+import { TRACK_STATUS_FETCHED } from '../../constants/downloadStatus';
 import request from '../../api/request';
 import Header from "../Header/Header";
 import Tracks from "../Tracks/Tracks";
 
-const Playlists = ({history}) => {
+const Playlists = ({ history }) => {
 
     const classes = useStyles();
 
@@ -62,58 +62,60 @@ const Playlists = ({history}) => {
     };
 
     return (
-        <div className={classes.main}>
-            <Helmet>
-                <title>Spotify Playlists | Youtube & Spotify Audio Downloader</title>
-            </Helmet>
-            <Card bg="dark" text="white">
-                <Header history={history}/>
-                <Card.Body>
-                    <div className={classes.playlists}>
-                        <Table striped hover variant="dark">
-                            <thead>
-                            <tr>
-                                <th width={'60px'}></th>
-                                <th width={'300px'}>Title</th>
-                                <th width={'60px'}>Tracks</th>
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {
-                                playlists.map((playlist, index) => {
-                                    // TODO: what are we gonna do !?!?!?
-                                    return <tr key={index}
-                                               className={(playlist.id === selectedPlaylist ? classes.tableRowSelected : classes.tableRow)}
-                                               onClick={() => getTracks(playlist.id)}>
-                                        <td style={{verticalAlign: 'middle'}}>
-                                            <Image src={playlist.image} className={classes.playlistImage}/>
-                                        </td>
-                                        <td style={{verticalAlign: 'middle'}}>
-                                            {playlist.name}
-                                        </td>
-                                        <td style={{verticalAlign: 'middle'}}>
-                                            {playlist.total}
-                                        </td>
-                                        <td>
-                                        </td>
+        <div className={classes.content}>
+            <div className={classes.main}>
+                <Helmet>
+                    <title>Spotify Playlists | Youtube & Spotify Audio Downloader</title>
+                </Helmet>
+                <Card bg="dark" text="white">
+                    <Header history={history} />
+                    <Card.Body>
+                        <div className={classes.playlists}>
+                            <Table striped hover variant="dark">
+                                <thead>
+                                    <tr>
+                                        <th width={'60px'}></th>
+                                        <th width={'300px'}>Title</th>
+                                        <th width={'60px'}>Tracks</th>
+                                        <th></th>
                                     </tr>
-                                })
-                            }
-                            </tbody>
-                        </Table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    {
+                                        playlists.map((playlist, index) => {
+                                            // TODO: what are we gonna do !?!?!?
+                                            return <tr key={index}
+                                                className={(playlist.id === selectedPlaylist ? classes.tableRowSelected : classes.tableRow)}
+                                                onClick={() => getTracks(playlist.id)}>
+                                                <td style={{ verticalAlign: 'middle' }}>
+                                                    <Image src={playlist.image} className={classes.playlistImage} />
+                                                </td>
+                                                <td style={{ verticalAlign: 'middle' }}>
+                                                    {playlist.name}
+                                                </td>
+                                                <td style={{ verticalAlign: 'middle' }}>
+                                                    {playlist.total}
+                                                </td>
+                                                <td>
+                                                </td>
+                                            </tr>
+                                        })
+                                    }
+                                </tbody>
+                            </Table>
+                        </div>
 
-                    <Tracks
-                        tracks={tracks}
-                        setTracks={setTracks}
-                        setFetchedIds={setFetchedIds}
-                        fetchedIds={fetchedIds}
-                        fetching={fetching}
-                        setFetching={setFetching}
-                    />
-                </Card.Body>
-            </Card>
+                        <Tracks
+                            tracks={tracks}
+                            setTracks={setTracks}
+                            setFetchedIds={setFetchedIds}
+                            fetchedIds={fetchedIds}
+                            fetching={fetching}
+                            setFetching={setFetching}
+                        />
+                    </Card.Body>
+                </Card>
+            </div>
         </div>
     );
 };

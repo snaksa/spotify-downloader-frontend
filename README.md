@@ -41,7 +41,7 @@ services:
 ### Environment variables
 The application relies on several environment variables for its configuration.
 - `REACT_APP_URL` - Current app URL
-- `REACT_APP_API_URL` - Spotify backend URL (**[spotify-downlaoder-backend](https://github.com/snaksa/spotify-downloader-backend)**)
+- `REACT_APP_API_URL` - Spotify backend URL (**[spotify-downloader-backend](https://github.com/snaksa/spotify-downloader-backend)**)
 - `REACT_APP_DOWNLOAD_URL` - NodeJS app to download audio from Youtube URLs (**[youtube-mp3-downloader](https://github.com/snaksa/youtube-mp3-downloader)**)
 - `REACT_APP_SPOTIFY_CLIENT_ID` - Spotify project API key
 

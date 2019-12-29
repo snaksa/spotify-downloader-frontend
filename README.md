@@ -1,7 +1,7 @@
 This repo contains a ReactJS application which connects to Symfony API implemented in the following repository **[spotiy-downloader-backend](https://github.com/snaksa/spotify-downloader-backend)**
 
 ## Tech Stack
-- **[ReactJS](https://reactjs.org/)**
+- **[ReactJS](https://reactjs.org)**
 - **[Docker](https://www.docker.com)**
 
 ### Requirements

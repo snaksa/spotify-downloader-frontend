@@ -87,6 +87,9 @@ const Home = () => {
                             </Form.Text>
 
                             <Image src={trackThumbnail} />
+                            <Form.Text>
+                                {trackTitle ? 'Your download will start shortly' : ''}
+                            </Form.Text>
                         </div>
                     </div>
                     <div className={classes.headerLogo}>

@@ -1,68 +1,52 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This repo contains a ReactJS application which connects to Symfony API implemented in the following repository **[spotiy-downloader-backend](https://github.com/snaksa/spotify-downloader-backend)**
 
-## Available Scripts
+## Tech Stack
+- **[ReactJS](https://reactjs.org/)**
+- **[Docker](https://www.docker.com)**
 
-In the project directory, you can run:
+### Requirements
+- **[Docker](https://www.docker.com)**
 
-### `yarn start`
+### Prerequisites
+- **[Spotify project and API key](https://developer.spotify.com)**
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Installation
+Clone the GitHub repository
+```bash
+git clone git@github.com:snaksa/spotify-downloader-frontend.git
+cd spotify-downloader-frontend
+```
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+Build docker image or use the public one from **[DockerHub](https://hub.docker.com/u/snaksa)**
+```bash
+docker build -t snaksa/spotify-downloader-frontend .
+```
 
-### `yarn test`
+Docker Compose configuration to run the project
+```yaml
+version: "3"
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+services:
+  app:
+    image: snaksa/spotify-downloader-frontend
+    build:
+      context: .
+    container_name: spotify-frontend
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+``` 
 
-### `yarn build`
+### Environment variables
+The application relies on several environment variables for its configuration.
+- `REACT_APP_URL` - Current app URL
+- `REACT_APP_API_URL` - Spotify backend URL (**[spotify-downlaoder-backend](https://github.com/snaksa/spotify-downloader-backend)**)
+- `REACT_APP_DOWNLOAD_URL` - NodeJS app to download audio from Youtube URLs (**[youtube-mp3-downloader](https://github.com/snaksa/youtube-mp3-downloader)**)
+- `REACT_APP_SPOTIFY_CLIENT_ID` - Spotify project API key
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Backend
+You need the Symfony backend API to be able to use this app which is implemented in the following repository **[spotiy-downloader-backend](https://github.com/snaksa/spotify-downloader-backend)**. 
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+### NodeJS
+You need the following NodeJS server to download audio from Youtube **[youtube-mp3-downloader](https://github.com/snaksa/youtube-mp3-downloader)**
